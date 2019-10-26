@@ -1,0 +1,104 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFrameworks>net20;net35;net45;net46;net47;net48</TargetFrameworks>
+    <!-- <TargetFramework>net47</TargetFramework> -->
+    <Authors>Andreas Rohleder</Authors>
+    <Company>CaveSystems GmbH, Andreas Rohleder</Company>
+    <Description>CaveSystems Cardinal - A windows service program able to run enslaved console programs in background as local system apps.</Description>
+    <Copyright>(c) 2003-$([System.DateTime]::UtcNow.Year) Andreas Rohleder</Copyright>
+    <PackageIconUrl>https://www.cavesystems.de/favicon.ico</PackageIconUrl>
+    <PackageLicenseExpression>LGPL-3.0-only</PackageLicenseExpression>
+    <DocumentationFile>bin\$(Configuration)\$(TargetFramework)\$(AssemblyName).xml</DocumentationFile>
+    <FileVersion>$([System.DateTime]::UtcNow.Year).$([System.DateTime]::UtcNow.ToString("MMdd")).$([System.DateTime]::UtcNow.ToString("HHmm")).$([System.DateTime]::UtcNow.ToString("ssfff"))</FileVersion>
+    <LangVersion>latest</LangVersion>
+    <PackageId>cave-cardinal</PackageId>
+    <AssemblyTitle>Cardinal Service</AssemblyTitle>
+    <AssemblyName>cave-cardinal</AssemblyName>
+    <Product>Cardinal</Product>
+
+    <!--project-->
+    <RootNamespace>Cave.Cardinal</RootNamespace>
+    <AssemblyOriginatorKeyFile>Cave.Cardinal.snk</AssemblyOriginatorKeyFile>
+    <Product>CaveSystems Cardinal Service</Product>
+    <PackageTags>CaveSystems Cardinal Service</PackageTags>
+    <Description>Allows to run any console program as service.</Description>
+    <PackageProjectUrl>https://github.com/CaveSystems/cave-cardinal</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/CaveSystems/cave-cardinal</RepositoryUrl>
+
+    <!--settings-->
+    <PackageReleaseNotes />
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+    <SignAssembly>true</SignAssembly>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <GenerateAssemblyInfo>true</GenerateAssemblyInfo>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <NeutralLanguage />
+    <DelaySign>false</DelaySign>
+    <DebugType>portable</DebugType>
+    <DebugSymbols>true</DebugSymbols>
+    <IncludeSymbols>true</IncludeSymbols>
+    <IncludeSymbolsInPackage>true</IncludeSymbolsInPackage>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <EmbedUntrackedSources>true</EmbedUntrackedSources>
+    <Deterministic>true</Deterministic>
+    <DeterministicSourcePaths>false</DeterministicSourcePaths>
+    <ApplicationIcon>cave-cardinal.ico</ApplicationIcon>
+
+  </PropertyGroup>
+
+  <!-- Find Windows Kit path and then SignTool path for the post-build event 
+  <PropertyGroup>
+    <WindowsKitsRoot>$([MSBuild]::GetRegistryValueFromView('HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows Kits\Installed Roots', 'KitsRoot10', null, RegistryView.Registry32, RegistryView.Default))</WindowsKitsRoot>
+    <WindowsKitsRoot Condition="'$(WindowsKitsRoot)' == ''">$([MSBuild]::GetRegistryValueFromView('HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows Kits\Installed Roots', 'KitsRoot81', null, RegistryView.Registry32, RegistryView.Default))</WindowsKitsRoot>
+    <WindowsKitsRoot Condition="'$(WindowsKitsRoot)' == ''">$([MSBuild]::GetRegistryValueFromView('HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows Kits\Installed Roots', 'KitsRoot', null, RegistryView.Registry32, RegistryView.Default))</WindowsKitsRoot>
+    <SignToolPath Condition="'$(SignToolPath)' == '' And '$(Platform)' == 'AnyCPU' and Exists('$(WindowsKitsRoot)bin\x64\signtool.exe')">$(WindowsKitsRoot)bin\x64\</SignToolPath>
+    <SignToolPath Condition="'$(SignToolPath)' == '' And Exists('$(WindowsKitsRoot)bin\$(Platform)\signtool.exe')">$(WindowsKitsRoot)bin\$(Platform)\</SignToolPath>
+    <SignToolPathBin Condition="'$(SignToolPath)' == ''">$([System.IO.Directory]::GetDirectories('$(WindowsKitsRoot)bin',"10.0.*"))</SignToolPathBin>
+    <SignToolPathLen Condition="'$(SignToolPathBin)' != ''">$(SignToolPathBin.Split(';').Length)</SignToolPathLen>
+    <SignToolPathIndex Condition="'$(SignToolPathLen)' != ''">$([MSBuild]::Add(-1, $(SignToolPathLen)))</SignToolPathIndex>
+    <SignToolPathBase Condition="'$(SignToolPathIndex)' != ''">$(SignToolPathBin.Split(';').GetValue($(SignToolPathIndex)))\</SignToolPathBase>
+    <SignToolPath Condition="'$(SignToolPath)' == '' And '$(SignToolPathBase)' != '' And '$(Platform)' == 'AnyCPU'">$(SignToolPathBase)x64\</SignToolPath>
+    <SignToolPath Condition="'$(SignToolPath)' == '' And '$(SignToolPathBase)' != ''">$(SignToolPathBase)$(Platform)\</SignToolPath>
+  </PropertyGroup>
+  -->
+  
+  <ItemGroup>
+    <None Remove="cave-cardinal-sample.ini" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <AdditionalFiles Include="stylecop.json" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)'=='net20' OR '$(TargetFramework)'=='netstandard1.3'">
+    <PackageReference Include="Cave.Backports" Version="1.0.6" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Cave.FileSystem" Version="1.1.2-ci-20190324-1" />
+    <PackageReference Include="Cave.Service" Version="1.0.4-ci-20191024-2" />
+    <PackageReference Include="Cave.Settings" Version="1.0.4-ci-20190521-1" />
+    <PackageReference Include="StyleCop.Analyzers" Version="1.1.118">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="cave-cardinal-sample.ini">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Properties\" />
+  </ItemGroup>
+
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent" Condition="$(Configuration)!=DEBUG">
+    <Exec Command="&quot;$(SignToolPath)signtool.exe&quot; sign /t http://timestamp.verisign.com/scripts/timestamp.dll /sha1 4DC28D5A3DFC428FA11E2E921ECF4AF3C094F17F $(TargetPath)&#xD;&#xA;" />
+  </Target>
+
+</Project>
