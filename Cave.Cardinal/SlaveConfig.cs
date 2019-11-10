@@ -31,5 +31,10 @@ namespace Cave.Cardinal
         /// Timeout when waiting for slave exit or output (stderr, stdout). After exceeding the timeout the slave will be killed.
         /// </summary>
         public TimeSpan Timeout;
+
+        /// <summary>
+        /// Logfile produced by the process.
+        /// </summary>
+        public string LogFile;
     }
 }

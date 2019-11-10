@@ -3,7 +3,6 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFrameworks>net20;net35;net45;net46;net47;net48</TargetFrameworks>
-    <!-- <TargetFramework>net47</TargetFramework> -->
     <Authors>Andreas Rohleder</Authors>
     <Company>CaveSystems GmbH, Andreas Rohleder</Company>
     <Description>CaveSystems Cardinal - A windows service program able to run enslaved console programs in background as local system apps.</Description>
@@ -46,7 +45,12 @@
     <Deterministic>true</Deterministic>
     <DeterministicSourcePaths>false</DeterministicSourcePaths>
     <ApplicationIcon>cave-cardinal.ico</ApplicationIcon>
+    <Version>1.0.1</Version>
+  </PropertyGroup>
 
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <TargetFramework Condition="'$(Configuration)' == 'Debug'">net47</TargetFramework>
   </PropertyGroup>
 
   <!-- Find Windows Kit path and then SignTool path for the post-build event 

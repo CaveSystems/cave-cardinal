@@ -1,5 +1,8 @@
 ﻿using System;
+using System.IO;
 using System.Threading;
+using System.Threading.Tasks;
+using Cave.IO;
 using Cave.Logging;
 
 namespace Cave.Cardinal
@@ -63,6 +66,10 @@ namespace Cave.Cardinal
                         Timeout = Config.Timeout,
                         WorkingDirectory = Config.WorkingDirectory,
                     };
+                    if (!string.IsNullOrEmpty(Config.LogFile))
+                    {
+                        processHandler.Started += StartLogFileReader;
+                    }
                     log.LogInfo($"Slave <cyan>{Config.Name}<default> process starting...");
                     var exitCode = processHandler.RunRedirected();
                     log.LogInfo($"Slave <cyan>{Config.Name}<default> process exited with exit code <cyan>{exitCode}<default>.");
@@ -77,6 +84,27 @@ namespace Cave.Cardinal
                 }
             }
             log.LogDebug($"Slave <cyan>{Config.Name}<default> handling finished.");
+        }
+
+        void StartLogFileReader(object sender, EventArgs e)
+        {
+            Task.Factory.StartNew(() => ReadLogFile((ProcessHandler)sender));
+        }
+
+        void ReadLogFile(ProcessHandler process)
+        {
+            using var stream = File.Open(Config.LogFile, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+            using var buffer = new FifoStream();
+            var reader = new DataReader(buffer);
+            while (process.IsRunning)
+            {
+                buffer.AppendStream(stream);
+                while (buffer.Contains(10))
+                {
+                    var line = reader.ReadLine().TrimEnd('\r', ' ');
+                    log.LogInfo($"StdOut: <green>{line}");
+                }
+            }
         }
     }
 }

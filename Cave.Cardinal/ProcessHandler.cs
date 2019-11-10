@@ -29,6 +29,11 @@ namespace Cave.Cardinal
 
         public string Name { get; }
 
+        public bool IsRunning { get; private set; }
+
+        public event EventHandler<EventArgs> Started;
+        public event EventHandler<EventArgs> Exited;
+
         public int RunRedirected()
         {
             log.LogDebug($"Start process {Name} '<cyan>{FileName}<default>' '<cyan>{Arguments}<default>'");
@@ -60,6 +65,8 @@ namespace Cave.Cardinal
                         timeoutMilliseconds = -1;
                     }
 
+                    IsRunning = true;
+                    Started?.Invoke(this, new EventArgs());
                     var result = process.WaitForExit(timeoutMilliseconds);
                     result &= outputWaitHandle.WaitOne(timeoutMilliseconds);
                     result &= errorWaitHandle.WaitOne(timeoutMilliseconds);
@@ -67,9 +74,9 @@ namespace Cave.Cardinal
                     if (result)
                     {
                         log.LogVerbose($"Process <cyan>{Name}<default> exited with code <cyan>{process.ExitCode}<default>.");
-                        var code = process.ExitCode;
+                        int exitCode = process.ExitCode;
                         process = null;
-                        return code;
+                        return exitCode;
                     }
                     else
                     {
@@ -81,6 +88,8 @@ namespace Cave.Cardinal
             {
                 KillProcessAndChildren();
                 process = null;
+                IsRunning = false;
+                Exited?.Invoke(this, new EventArgs());
             }
         }
 
@@ -94,12 +103,18 @@ namespace Cave.Cardinal
 
         void StdOut(string data)
         {
-            log.LogInfo($"StdOut: <green>{data}");
+            if (!string.IsNullOrEmpty(data?.Trim()))
+            {
+                log.LogInfo($"StdOut: <green>{data}");
+            }
         }
 
         void StdErr(string data)
         {
-            log.LogError($"StdErr: <red>{data}");
+            if (!string.IsNullOrEmpty(data?.Trim()))
+            {
+                log.LogError($"StdErr: <red>{data}");
+            }
         }
 
         void KillProcessAndChildren(Process process)
