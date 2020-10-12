@@ -40,7 +40,7 @@ namespace Cave.Cron
         {
             if (parts.Length > 1)
             {
-                string firstItem = parts[0].ToLower();
+                var firstItem = parts[0].ToLower();
                 if (firstItem.StartsWith("@"))
                 {
                     switch (firstItem)
@@ -75,15 +75,15 @@ namespace Cave.Cron
                 throw new Exception(string.Format("Invalid number of parts at cron entry! Expected '@repetition' or 'minute hour day month weekday', got '{0}'!", parts.Join(" ")));
             }
 
-            CronItem result = new CronItem();
+            var result = new CronItem();
             if (parts.Length > 5)
             {
                 result.Command = CronCommand.Parse(string.Join(" ", parts, 5, parts.Length - 5));
             }
 
-            for (int i = 0; i < 5; i++)
+            for (var i = 0; i < 5; i++)
             {
-                string text = parts[i].Trim(' ', '\t').ToLower();
+                var text = parts[i].Trim(' ', '\t').ToLower();
                 switch (i)
                 {
                     case 3:
@@ -142,10 +142,7 @@ namespace Cave.Cron
         /// </summary>
         /// <param name="line">Configurationline to parse.</param>
         /// <returns>Returns a new <see cref="CronItem"/> instance.</returns>
-        public static CronItem Parse(string line)
-        {
-            return Parse(line.Split(new char[] { ' ', '\t' }, StringSplitOptions.RemoveEmptyEntries));
-        }
+        public static CronItem Parse(string line) => Parse(line.Split(new char[] { ' ', '\t' }, StringSplitOptions.RemoveEmptyEntries));
 
         readonly Range[] ranges = new Range[5]
         {
@@ -171,79 +168,37 @@ namespace Cave.Cron
         /// <summary>
         /// Gets the <see cref="CronTimeRanges"/>.
         /// </summary>
-        public CronTimeRanges Ranges
-        {
-            get
-            {
-                return new CronTimeRanges(ranges);
-            }
-        }
+        public CronTimeRanges Ranges => new CronTimeRanges(ranges);
 
         /// <summary>
         /// Gets the <see cref="CronTimeStrings"/>.
         /// </summary>
-        public CronTimeStrings Strings
-        {
-            get
-            {
-                return new CronTimeStrings(ranges);
-            }
-        }
+        public CronTimeStrings Strings => new CronTimeStrings(ranges);
 
         /// <summary>
         /// Gets a value indicating whether this item is run monthly or not.
         /// </summary>
-        public bool Monthly
-        {
-            get
-            {
-                return Strings[CronItemTimeType.Month] == "*";
-            }
-        }
+        public bool Monthly => Strings[CronItemTimeType.Month] == "*";
 
         /// <summary>
         /// Gets a value indicating whether this item is run weekly or not.
         /// </summary>
-        public bool Weekly
-        {
-            get
-            {
-                return (Weekdays.Length == 1) && Daily && Monthly;
-            }
-        }
+        public bool Weekly => (Weekdays.Length == 1) && Daily && Monthly;
 
         /// <summary>
         /// Gets a value indicating whether this item is run daily or not.
         /// </summary>
-        public bool Daily
-        {
-            get
-            {
-                return (Strings[CronItemTimeType.Day] == "*") && Monthly && (Strings[CronItemTimeType.Weekday] == "*");
-            }
-        }
+        public bool Daily => (Strings[CronItemTimeType.Day] == "*") && Monthly && (Strings[CronItemTimeType.Weekday] == "*");
 
         /// <summary>
         /// Gets a value indicating whether this item is run hourly or not.
         /// </summary>
-        public bool Hourly
-        {
-            get
-            {
-                return (Strings[CronItemTimeType.Hour] == "*") && Daily;
-            }
-        }
+        public bool Hourly => (Strings[CronItemTimeType.Hour] == "*") && Daily;
 
         /// <summary>
         /// Gets a value indicating whether this item is run minutely or not.
         /// </summary>
-        public bool Minutely
-        {
-            get
-            {
-                return (Strings[CronItemTimeType.Minute] == "*") && Hourly;
-            }
-        }
+        public bool Minutely => (Strings[CronItemTimeType.Minute] == "*") && Hourly;
 
         /// <summary>
         /// Gets or sets the <see cref="DayOfWeek"/>s this <see cref="CronItem"/> is run at.
@@ -252,10 +207,10 @@ namespace Cave.Cron
         {
             get
             {
-                List<DayOfWeek> result = new List<DayOfWeek>();
-                foreach (int value in Ranges[CronItemTimeType.Weekday])
+                var result = new List<DayOfWeek>();
+                foreach (var value in Ranges[CronItemTimeType.Weekday])
                 {
-                    DayOfWeek dayOfWeek = (DayOfWeek)value;
+                    var dayOfWeek = (DayOfWeek)value;
                     if (!result.Contains(dayOfWeek))
                     {
                         result.Add(dayOfWeek);
@@ -266,13 +221,13 @@ namespace Cave.Cron
             }
             set
             {
-                bool[] days = new bool[7];
-                foreach (DayOfWeek dayOfWeek in value)
+                var days = new bool[7];
+                foreach (var dayOfWeek in value)
                 {
                     days[(int)dayOfWeek] = true;
                 }
-                StringBuilder result = new StringBuilder();
-                for (int i = 0; i < 7; i++)
+                var result = new StringBuilder();
+                for (var i = 0; i < 7; i++)
                 {
                     if (result.Length > 0)
                     {

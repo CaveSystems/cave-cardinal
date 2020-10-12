@@ -16,11 +16,11 @@ namespace Cave.Cron
         public static CronCommand Parse(string text)
         {
             var result = default(CronCommand);
-            int i = 0;
-            Stack<char> depth = new Stack<char>();
+            var i = 0;
+            var depth = new Stack<char>();
             for (; i < text.Length; i++)
             {
-                char c = text[i];
+                var c = text[i];
                 switch (c)
                 {
                     case ' ':
@@ -33,7 +33,7 @@ namespace Cave.Cron
                         break;
                     case '\'':
                     case '"':
-                        bool push = true;
+                        var push = true;
                         if (depth.Count > 0)
                         {
                             if (depth.Peek() == c)

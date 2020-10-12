@@ -9,7 +9,7 @@ namespace Cave.Cardinal
 {
     class Program : ServiceProgram
     {
-        static void Main(string[] args)
+        static void Main()
         {
             using var program = new Program();
             program.Run();
@@ -50,7 +50,7 @@ namespace Cave.Cardinal
 
             if (now != lastCheck)
             {
-                for (int i = 0; i < ProgramConfig.Items.Count; i++)
+                for (var i = 0; i < ProgramConfig.Items.Count; i++)
                 {
                     CheckCronItem(i);
                 }
@@ -64,15 +64,15 @@ namespace Cave.Cardinal
             var item = ProgramConfig.Items[itemNumber];
 
             // check all minutes since last check
-            for (long minute = lastCheck + 1; minute <= now; minute++)
+            for (var minute = lastCheck + 1; minute <= now; minute++)
             {
-                DateTime checkTime = new DateTime(minute * TimeSpan.TicksPerMinute);
+                var checkTime = new DateTime(minute * TimeSpan.TicksPerMinute);
 
-                bool runMonth = item.Ranges[CronItemTimeType.Month].Contains(checkTime.Month);
-                bool runDay = item.Ranges[CronItemTimeType.Day].Contains(checkTime.Day);
-                bool runWeekday = item.Ranges[CronItemTimeType.Weekday].Contains((int)checkTime.DayOfWeek);
-                bool runHour = item.Ranges[CronItemTimeType.Hour].Contains(checkTime.Hour);
-                bool runMinute = item.Ranges[CronItemTimeType.Minute].Contains(checkTime.Minute);
+                var runMonth = item.Ranges[CronItemTimeType.Month].Contains(checkTime.Month);
+                var runDay = item.Ranges[CronItemTimeType.Day].Contains(checkTime.Day);
+                var runWeekday = item.Ranges[CronItemTimeType.Weekday].Contains((int)checkTime.DayOfWeek);
+                var runHour = item.Ranges[CronItemTimeType.Hour].Contains(checkTime.Hour);
+                var runMinute = item.Ranges[CronItemTimeType.Minute].Contains(checkTime.Minute);
 
                 if (runMonth && runDay && runWeekday && runHour && runMinute)
                 {

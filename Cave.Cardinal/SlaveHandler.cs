@@ -86,10 +86,7 @@ namespace Cave.Cardinal
             log.LogDebug($"Slave <cyan>{Config.Name}<default> handling finished.");
         }
 
-        void StartLogFileReader(object sender, EventArgs e)
-        {
-            Task.Factory.StartNew(() => ReadLogFile((ProcessHandler)sender));
-        }
+        void StartLogFileReader(object sender, EventArgs e) => Task.Factory.StartNew(() => ReadLogFile((ProcessHandler)sender));
 
         void ReadLogFile(ProcessHandler process)
         {

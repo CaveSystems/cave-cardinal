@@ -10,23 +10,14 @@ namespace Cave.Cron
     {
         readonly Range[] ranges;
 
-        internal CronTimeRanges(Range[] ranges)
-        {
-            this.ranges = ranges;
-        }
+        internal CronTimeRanges(Range[] ranges) => this.ranges = ranges;
 
         /// <summary>
         /// Gets the specified time range.
         /// </summary>
         /// <param name="type">The type.</param>
         /// <returns>Returns the time range.</returns>
-        public Range this[CronItemTimeType type]
-        {
-            get
-            {
-                return ranges[(int)type];
-            }
-        }
+        public Range this[CronItemTimeType type] => ranges[(int)type];
 
         /// <summary>
         /// Gets the ranges as cron config string.
@@ -34,15 +25,15 @@ namespace Cave.Cron
         /// <returns>A new config string.</returns>
         public override string ToString()
         {
-            StringBuilder sb = new StringBuilder();
-            foreach (Range range in ranges)
+            var sb = new StringBuilder();
+            foreach (var range in ranges)
             {
                 if (sb.Length > 0)
                 {
                     sb.Append(" ");
                 }
 
-                sb.Append(range.ToString());
+                sb.Append(range);
             }
             return sb.ToString();
         }

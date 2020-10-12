@@ -79,6 +79,7 @@
 
   <ItemGroup>
     <PackageReference Include="Cave.IniFile" Version="2.0.1-ci-20201012-1" />
+    <PackageReference Include="Cave.Logging" Version="2.0.1" />
     <PackageReference Include="Cave.Service" Version="2.0.0" />
     <PackageReference Include="StyleCop.Analyzers" Version="1.1.118">
       <PrivateAssets>all</PrivateAssets>

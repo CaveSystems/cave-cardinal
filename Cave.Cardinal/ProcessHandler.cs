@@ -8,7 +8,6 @@ namespace Cave.Cardinal
 {
     class ProcessHandler
     {
-        Process process;
         readonly Logger log = new Logger();
 
         public ProcessHandler(string name)
@@ -17,7 +16,7 @@ namespace Cave.Cardinal
             log.SourceName = Name;
         }
 
-        public Process Process => process;
+        public Process Process { get; private set; }
 
         public TimeSpan Timeout { get; set; }
 
@@ -50,16 +49,16 @@ namespace Cave.Cardinal
             };
             try
             {
-                using (ManualResetEvent outputWaitHandle = new ManualResetEvent(false))
-                using (ManualResetEvent errorWaitHandle = new ManualResetEvent(false))
-                using (process = Process.Start(startInfo))
+                using (var outputWaitHandle = new ManualResetEvent(false))
+                using (var errorWaitHandle = new ManualResetEvent(false))
+                using (Process = Process.Start(startInfo))
                 {
-                    log.LogVerbose($"Start reading from process [<cyan>{process.Id}<default>] <cyan>{Name}");
-                    process.ErrorDataReceived += (sender, e) => { if (e.Data != null) { StdErr(e.Data); } else { errorWaitHandle.Set(); } };
-                    process.OutputDataReceived += (sender, e) => { if (e.Data != null) { StdOut(e.Data); } else { outputWaitHandle.Set(); } };
-                    process.BeginErrorReadLine();
-                    process.BeginOutputReadLine();
-                    log.LogVerbose($"Wait for exit [<cyan>{process.Id}<default>] <cyan>{Name}");
+                    log.LogVerbose($"Start reading from process [<cyan>{Process.Id}<default>] <cyan>{Name}");
+                    Process.ErrorDataReceived += (sender, e) => { if (e.Data != null) { StdErr(e.Data); } else { errorWaitHandle.Set(); } };
+                    Process.OutputDataReceived += (sender, e) => { if (e.Data != null) { StdOut(e.Data); } else { outputWaitHandle.Set(); } };
+                    Process.BeginErrorReadLine();
+                    Process.BeginOutputReadLine();
+                    log.LogVerbose($"Wait for exit [<cyan>{Process.Id}<default>] <cyan>{Name}");
                     var timeoutMilliseconds = (int)Timeout.TotalMilliseconds;
                     if (timeoutMilliseconds <= 0)
                     {
@@ -68,15 +67,15 @@ namespace Cave.Cardinal
 
                     IsRunning = true;
                     Started?.Invoke(this, new EventArgs());
-                    var result = process.WaitForExit(timeoutMilliseconds);
+                    var result = Process.WaitForExit(timeoutMilliseconds);
                     result &= outputWaitHandle.WaitOne(timeoutMilliseconds);
                     result &= errorWaitHandle.WaitOne(timeoutMilliseconds);
 
                     if (result)
                     {
-                        log.LogVerbose($"Process <cyan>{Name}<default> exited with code <cyan>{process.ExitCode}<default>.");
-                        int exitCode = process.ExitCode;
-                        process = null;
+                        log.LogVerbose($"Process <cyan>{Name}<default> exited with code <cyan>{Process.ExitCode}<default>.");
+                        var exitCode = Process.ExitCode;
+                        Process = null;
                         return exitCode;
                     }
                     else
@@ -88,7 +87,7 @@ namespace Cave.Cardinal
             finally
             {
                 KillProcessAndChildren();
-                process = null;
+                Process = null;
                 IsRunning = false;
                 Exited?.Invoke(this, new EventArgs());
             }
@@ -96,9 +95,9 @@ namespace Cave.Cardinal
 
         public void KillProcessAndChildren()
         {
-            if (process != null)
+            if (Process != null)
             {
-                KillProcessAndChildren(process);
+                KillProcessAndChildren(Process);
             }
         }
 

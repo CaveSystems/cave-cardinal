@@ -17,7 +17,7 @@ namespace Cave.Cardinal
             var configFileName = Path.ChangeExtension(typeof(ProgramConfig).Assembly.GetAssemblyFilePath(), ".ini");
             var config = IniReader.FromFile(configFileName);
             var service = config.ReadStructFields<ServiceSettings>("Service");
-            AssemblyVersionInfo i = AssemblyVersionInfo.Program;
+            var i = AssemblyVersionInfo.Program;
             service.Description ??= i.Description;
             service.Title ??= i.Title;
             service.Name ??= i.Product;
@@ -30,7 +30,7 @@ namespace Cave.Cardinal
                 var slaveSection = $"slave:{slaveName}";
                 if (config.HasSection(slaveSection))
                 {
-                    var slaveConfig = config.ReadStruct<SlaveConfig>(slaveSection);
+                    var slaveConfig = config.ReadStructFields<SlaveConfig>(slaveSection);
                     slaveConfig.Name = slaveName;
                     slaves.Add(new SlaveHandler(slaveConfig));
                 }
@@ -41,7 +41,7 @@ namespace Cave.Cardinal
             var items = new List<CronItem>();
             foreach (var entry in config.ReadSection("cron", false))
             {
-                string line = entry.Trim(new char[] { '\t', ' ' });
+                var line = entry.Trim(new char[] { '\t', ' ' });
                 if (line.Contains("#"))
                 {
                     line = line.Substring(0, line.IndexOf('#')).Trim(new char[] { '\t', ' ' });
