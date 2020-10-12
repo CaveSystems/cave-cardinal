@@ -77,14 +77,9 @@
     <AdditionalFiles Include="stylecop.json" />
   </ItemGroup>
 
-  <ItemGroup Condition="'$(TargetFramework)'=='net20' OR '$(TargetFramework)'=='netstandard1.3'">
-    <PackageReference Include="Cave.Backports" Version="1.0.6" />
-  </ItemGroup>
-
   <ItemGroup>
-    <PackageReference Include="Cave.FileSystem" Version="1.1.2" />
-    <PackageReference Include="Cave.Service" Version="1.0.4" />
-    <PackageReference Include="Cave.Settings" Version="1.0.4" />
+    <PackageReference Include="Cave.IniFile" Version="2.0.1-ci-20201012-1" />
+    <PackageReference Include="Cave.Service" Version="2.0.0" />
     <PackageReference Include="StyleCop.Analyzers" Version="1.1.118">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>

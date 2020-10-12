@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.ServiceProcess;
 using Cave.Cron;
 using Cave.Logging;
@@ -13,8 +14,9 @@ namespace Cave.Cardinal
             var log = new Logger("Cardinal");
             log.LogInfo("Loading configuration...");
 
-            var config = IniReader.FromLocation(new FileLocation(RootLocation.Program, fileName: "cave-cardinal.ini"));
-            var service = config.ReadStruct<ServiceSettings>("Service");
+            var configFileName = Path.ChangeExtension(typeof(ProgramConfig).Assembly.GetAssemblyFilePath(), ".ini");
+            var config = IniReader.FromFile(configFileName);
+            var service = config.ReadStructFields<ServiceSettings>("Service");
             AssemblyVersionInfo i = AssemblyVersionInfo.Program;
             service.Description ??= i.Description;
             service.Title ??= i.Title;

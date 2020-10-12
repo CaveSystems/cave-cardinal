@@ -9,12 +9,12 @@ namespace Cave.Cardinal
     class ProcessHandler
     {
         Process process;
-        Logger log;
+        readonly Logger log = new Logger();
 
         public ProcessHandler(string name)
         {
             Name = name ?? throw new ArgumentNullException(nameof(name));
-            log = new Logger(name);
+            log.SourceName = Name;
         }
 
         public Process Process => process;
@@ -46,6 +46,7 @@ namespace Cave.Cardinal
                 UseShellExecute = false,
                 RedirectStandardOutput = true,
                 RedirectStandardError = true,
+                RedirectStandardInput = true,
             };
             try
             {
@@ -113,7 +114,7 @@ namespace Cave.Cardinal
         {
             if (!string.IsNullOrEmpty(data?.Trim()))
             {
-                log.LogError($"StdErr: <red>{data}");
+                log.LogInfo($"StdErr: <red>{data}");
             }
         }
 
