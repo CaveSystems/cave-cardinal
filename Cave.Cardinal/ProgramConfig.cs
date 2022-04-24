@@ -9,13 +9,15 @@ namespace Cave.Cardinal
 {
     static class ProgramConfig
     {
-        static ProgramConfig()
+        public static void Load()
         {
             var log = new Logger("Cardinal");
             log.LogInfo("Loading configuration...");
 
             var configFileName = Path.ChangeExtension(typeof(ProgramConfig).Assembly.GetAssemblyFilePath(), ".ini");
-            var config = IniReader.FromFile(configFileName);
+            var iniSettings = IniProperties.Default;
+            iniSettings.DisableEscaping = true;
+            var config = IniReader.FromFile(configFileName, iniSettings);
             var service = config.ReadStructFields<ServiceSettings>("Service");
             var i = AssemblyVersionInfo.Program;
             service.Description ??= i.Description;
@@ -30,7 +32,7 @@ namespace Cave.Cardinal
                 var slaveSection = $"slave:{slaveName}";
                 if (config.HasSection(slaveSection))
                 {
-                    var slaveConfig = config.ReadStructFields<SlaveConfig>(slaveSection);
+                    var slaveConfig = config.ReadStructFields<SlaveConfig>(slaveSection, false);
                     slaveConfig.Name = slaveName;
                     slaves.Add(new SlaveHandler(slaveConfig));
                 }
@@ -65,10 +67,10 @@ namespace Cave.Cardinal
             Items = items.AsReadOnly();
         }
 
-        public static ServiceSettings Service { get; }
+        public static ServiceSettings Service { get; private set; }
 
-        public static IList<SlaveHandler> Slaves { get; }
+        public static IList<SlaveHandler> Slaves { get; private set; }
 
-        public static IList<CronItem> Items { get; }
+        public static IList<CronItem> Items { get; private set; }
     }
 }

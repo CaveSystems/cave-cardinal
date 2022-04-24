@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.IO;
 using System.Threading.Tasks;
 using Cave.Cron;
 using Cave.Logging;
@@ -9,13 +9,35 @@ namespace Cave.Cardinal
 {
     class Program : ServiceProgram
     {
+        public static bool TestFlagFile(string flagFile)
+        {
+            try
+            {
+                if (flagFile == null) return false;
+                var fileName = Environment.ExpandEnvironmentVariables(flagFile);
+                return File.Exists(fileName);
+            }
+            catch { return false; }
+        }
+
         static void Main()
         {
             using var program = new Program();
             program.Run();
         }
 
-        public Program() => ServiceName = ProgramConfig.Service.Name;
+        public Program()
+        {
+            try
+            {
+                ProgramConfig.Load();
+            }
+            catch(Exception ex)
+            {
+                throw new Exception("Could not load configuration.", ex);
+            }
+            ServiceName = ProgramConfig.Service.Name;
+        }
 
         protected override void OnKeyPressed(ConsoleKeyInfo keyInfo)
         {

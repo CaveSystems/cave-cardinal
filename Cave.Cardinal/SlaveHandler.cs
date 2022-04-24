@@ -57,10 +57,17 @@ namespace Cave.Cardinal
                         break;
                     }
                 }
+                if (Program.TestFlagFile(Config.FlagFile))
+                {
+                    log.LogInfo($"Slave <magenta>{Config.Name}<default> process startup blocked by flagfile <magenta>{Config.FlagFile}<default>...");
+                    continue;
+                }
+
                 try
                 {
                     processHandler = new ProcessHandler(Config.Name)
                     {
+                        FlagFile = Config.FlagFile,
                         FileName = Config.FileName,
                         Arguments = Config.Arguments,
                         Timeout = Config.Timeout,
@@ -90,6 +97,11 @@ namespace Cave.Cardinal
 
         void ReadLogFile(ProcessHandler process)
         {
+            while (!File.Exists(Config.LogFile))
+            {
+                if (!process.IsRunning) return;
+                Thread.Sleep(100);
+            }
             using var stream = File.Open(Config.LogFile, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
             using var buffer = new FifoStream();
             var reader = new DataReader(buffer);
@@ -101,6 +113,7 @@ namespace Cave.Cardinal
                     var line = reader.ReadLine().TrimEnd('\r', ' ');
                     log.LogInfo($"StdOut: <green>{line}");
                 }
+                buffer.FreeBuffers();
             }
         }
     }

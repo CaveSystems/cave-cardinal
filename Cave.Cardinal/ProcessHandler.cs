@@ -8,7 +8,7 @@ namespace Cave.Cardinal
 {
     class ProcessHandler
     {
-        readonly Logger log = new Logger();
+        readonly Logger log = new();
 
         public ProcessHandler(string name)
         {
@@ -28,9 +28,12 @@ namespace Cave.Cardinal
 
         public string Name { get; }
 
+        public string FlagFile { get; set; }
+
         public bool IsRunning { get; private set; }
 
         public event EventHandler<EventArgs> Started;
+
         public event EventHandler<EventArgs> Exited;
 
         public int RunRedirected()
@@ -45,7 +48,8 @@ namespace Cave.Cardinal
                 UseShellExecute = false,
                 RedirectStandardOutput = true,
                 RedirectStandardError = true,
-                RedirectStandardInput = true,
+                RedirectStandardInput = false,
+                ErrorDialog = false,
             };
             try
             {
@@ -59,18 +63,25 @@ namespace Cave.Cardinal
                     Process.BeginErrorReadLine();
                     Process.BeginOutputReadLine();
                     log.LogVerbose($"Wait for exit [<cyan>{Process.Id}<default>] <cyan>{Name}");
-                    var timeoutMilliseconds = (int)Timeout.TotalMilliseconds;
-                    if (timeoutMilliseconds <= 0)
-                    {
-                        timeoutMilliseconds = -1;
-                    }
 
                     IsRunning = true;
                     Started?.Invoke(this, new EventArgs());
-                    var result = Process.WaitForExit(timeoutMilliseconds);
-                    result &= outputWaitHandle.WaitOne(timeoutMilliseconds);
-                    result &= errorWaitHandle.WaitOne(timeoutMilliseconds);
 
+                    var watch = StopWatch.StartNew();
+                    while (!Process.HasExited)
+                    {
+                        if (Timeout.Ticks > 0 && watch.Elapsed > Timeout)
+                        {
+                            break;
+                        }
+                        Thread.Sleep(1000);
+                        if (Program.TestFlagFile(FlagFile))
+                        {
+                            throw new Exception($"Process stop requested by flagfile {FlagFile}!");
+                        }
+                    }
+
+                    var result = Process.HasExited && outputWaitHandle.WaitOne() && errorWaitHandle.WaitOne();
                     if (result)
                     {
                         log.LogVerbose($"Process <cyan>{Name}<default> exited with code <cyan>{Process.ExitCode}<default>.");

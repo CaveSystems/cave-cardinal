@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 
 namespace Cave.Cardinal
 {
@@ -26,6 +27,11 @@ namespace Cave.Cardinal
         /// Working directory the slave is started at.
         /// </summary>
         public string WorkingDirectory;
+
+        /// <summary>
+        /// Flagfile for slave locking.
+        /// </summary>
+        public string FlagFile;
 
         /// <summary>
         /// Timeout when waiting for slave exit or output (stderr, stdout). After exceeding the timeout the slave will be killed.

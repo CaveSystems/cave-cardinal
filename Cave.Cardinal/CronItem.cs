@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Cave.Collections;
+using Range = Cave.Collections.Range;
 
 namespace Cave.Cron
 {
@@ -43,31 +43,16 @@ namespace Cave.Cron
                 var firstItem = parts[0].ToLower();
                 if (firstItem.StartsWith("@"))
                 {
-                    switch (firstItem)
+                    return firstItem switch
                     {
-                        case "@yearly":
-                        case "@annually":
-                            return Parse($"0 0 1 1 * {parts.Skip(1).Join(" ")}");
-
-                        case "@monthly":
-                            return Parse($"0 0 1 * * {parts.Skip(1).Join(" ")}");
-
-                        case "@weekly":
-                            return Parse($"0 0 * * 0 {parts.Skip(1).Join(" ")}");
-
-                        case "@daily":
-                        case "@midnight":
-                            return Parse($"0 0 * * * {parts.Skip(1).Join(" ")}");
-
-                        case "@hourly":
-                            return Parse($"0 * * * * {parts.Skip(1).Join(" ")}");
-
-                        case "@reboot":
-                            throw new NotSupportedException(string.Format("RunOnce / @reboot is not supported!"));
-
-                        default:
-                            throw new FormatException(string.Format("Unknown cron repetition '{0}'!", firstItem));
-                    }
+                        "@yearly" or "@annually" => Parse($"0 0 1 1 * {parts.Skip(1).Join(" ")}"),
+                        "@monthly" => Parse($"0 0 1 * * {parts.Skip(1).Join(" ")}"),
+                        "@weekly" => Parse($"0 0 * * 0 {parts.Skip(1).Join(" ")}"),
+                        "@daily" or "@midnight" => Parse($"0 0 * * * {parts.Skip(1).Join(" ")}"),
+                        "@hourly" => Parse($"0 * * * * {parts.Skip(1).Join(" ")}"),
+                        "@reboot" => throw new NotSupportedException(string.Format("RunOnce / @reboot is not supported!")),
+                        _ => throw new FormatException(string.Format("Unknown cron repetition '{0}'!", firstItem)),
+                    };
                 }
             }
             if (parts.Length < 5)
@@ -168,12 +153,12 @@ namespace Cave.Cron
         /// <summary>
         /// Gets the <see cref="CronTimeRanges"/>.
         /// </summary>
-        public CronTimeRanges Ranges => new CronTimeRanges(ranges);
+        public CronTimeRanges Ranges => new(ranges);
 
         /// <summary>
         /// Gets the <see cref="CronTimeStrings"/>.
         /// </summary>
-        public CronTimeStrings Strings => new CronTimeStrings(ranges);
+        public CronTimeStrings Strings => new(ranges);
 
         /// <summary>
         /// Gets a value indicating whether this item is run monthly or not.
